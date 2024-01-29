@@ -7,8 +7,8 @@ import { Link } from 'react-router-dom';
 
 const Signup = () => {
   return (
-    <div className='mt-[4rem] md:mt-[3rem] lg:mt-[2rem] p-3 flex justify-center items-center'>
-      <div className='rounded-lg border bg-card text-card-foreground shadow-sm'>
+    <div className='mt-[3rem] lg:mt-[2rem] p-5 flex justify-center items-center'>
+      <div className='w-[360px] rounded-lg border bg-card text-card-foreground shadow-sm'>
         <div className='flex flex-col p-6 space-y-1 text-center'>
           <h3 className='font-semibold tracking-tight text-2xl'>
             Create an account
