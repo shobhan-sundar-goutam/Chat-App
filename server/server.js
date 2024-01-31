@@ -1,10 +1,10 @@
 import express from 'express';
 import http from 'http';
-import connectToDb from './config/database.js';
-import config from './config/index.js';
+import connectToDb from './src/config/database.js';
+import config from './src/config/index.js';
 
 // Routes
-import home from './routes/home.route.js';
+import home from './src/utils/routes/home.route.js';
 
 connectToDb();
 
@@ -17,5 +17,5 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/v1', home);
 
 server.listen(config.PORT, () => {
-  console.log(`Server is running at http://localhost:${config.PORT}`);
+    console.log(`Server is running at http://localhost:${config.PORT}`);
 });
