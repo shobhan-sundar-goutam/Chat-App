@@ -9,12 +9,13 @@ const userSchema = new mongoose.Schema(
         name: {
             type: String,
             required: [true, 'Please enter a your Name'],
+            trim: true,
             maxLength: [50, 'Name must be less than 50 characters'],
         },
         email: {
             type: String,
-            lowecase: true,
             required: [true, 'Email is required'],
+            trim: true,
             unique: true,
             validate: [validator.isEmail, 'Please enter a valid Email'],
         },
@@ -32,12 +33,12 @@ const userSchema = new mongoose.Schema(
                 type: String,
             },
         },
-        role: {
-            type: String,
-            //   enum: Object.values(AuthRoles),
-            //   default: AuthRoles.USER,
-            default: 'user',
-        },
+        // role: {
+        // type: String,
+        //  enum: Object.values(AuthRoles),
+        //  default: AuthRoles.USER,
+        // default: 'user',
+        // },
         forgotPasswordToken: String,
         forgotPasswordExpiry: Date,
     },

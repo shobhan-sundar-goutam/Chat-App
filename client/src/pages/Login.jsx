@@ -1,8 +1,8 @@
+import PasswordInput from '@/components/PasswordInput';
 import { GithubSvg } from '@/components/Svg/GithubSvg';
 import { GoogleSvg } from '@/components/Svg/GoogleSvg';
-import { CircleUserRound, LockKeyhole, Mail, UserRound } from 'lucide-react';
-import PasswordInput from '@/components/PasswordInput';
 import { Button } from '@/components/ui/button';
+import { LockKeyhole, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Login = () => {

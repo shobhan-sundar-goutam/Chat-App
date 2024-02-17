@@ -1,12 +1,12 @@
+import App from '@/App';
+import store from '@/app/store';
+import Home from '@/pages/Home';
+import Login from '@/pages/Login';
+import Signup from '@/pages/Signup';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import App from './App.jsx';
-import { store } from './app/store';
-import Home from './pages/Home.jsx';
-import Login from './pages/Login.jsx';
-import Signup from './pages/Signup.jsx';
 
 const router = createBrowserRouter([
   {

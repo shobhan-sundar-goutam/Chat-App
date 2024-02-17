@@ -1,8 +1,8 @@
 import config from '../config/index.js';
-import User from '../src/models/user.schema.js';
-import ApiResponse from '../src/utils/apiResponse.js';
-import asyncHandler from '../src/utils/asyncHandler.js';
-import CustomError from '../src/utils/customError.js';
+import User from '../models/user.schema.js';
+import ApiResponse from '../utils/apiResponse.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import CustomError from '../utils/customError.js';
 
 export const signup = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
@@ -14,8 +14,10 @@ export const signup = asyncHandler(async (req, res) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-        throw new CustomError('User already exists', 409);
+        throw new CustomError('User Already Exists', 409);
     }
+
+    // const localFilePath = req.file
 
     const user = await User.create({
         name,

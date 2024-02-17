@@ -1,31 +1,50 @@
+import { useSignupMutation } from '@/app/api/users';
 import PasswordInput from '@/components/PasswordInput';
 import { GithubSvg } from '@/components/Svg/GithubSvg';
 import { GoogleSvg } from '@/components/Svg/GoogleSvg';
 import { Button } from '@/components/ui/button';
-import { CircleUserRound, LockKeyhole, Mail } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { CircleUserRound, Loader2, LockKeyhole, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const Signup = () => {
-  const [userDetails, setUserDetails] = useState({
+  const [user, setUser] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
   const [errors, setErrors] = useState({});
+  const [signup, { isLoading }] = useSignupMutation();
+  const { toast } = useToast();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validateForm(userDetails);
+    const validationErrors = validateForm(user);
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
 
-    delete userDetails.confirmPassword;
-    console.log(userDetails);
+    try {
+      const { confirmPassword, ...userDataToSend } = user;
+      const response = await signup(userDataToSend).unwrap();
+      console.log(response);
+      toast({
+        description: response.message,
+        className: 'text-primary',
+      });
+    } catch (error) {
+      console.log(error);
+      toast({
+        variant: 'destructive',
+        description: error.data.message ?? 'Oops! Something went wrong.',
+      });
+    }
+
+    // console.log(user);
   };
 
   const validateForm = (data) => {
@@ -118,11 +137,11 @@ const Signup = () => {
                 placeholder='Name'
                 type='text'
                 name='name'
-                value={userDetails.name}
+                value={user.name}
                 required
                 onChange={(e) =>
-                  setUserDetails({
-                    ...userDetails,
+                  setUser({
+                    ...user,
                     [e.target.name]: e.target.value,
                   })
                 }
@@ -145,11 +164,11 @@ const Signup = () => {
                 placeholder='mail@example.com'
                 type='email'
                 name='email'
-                value={userDetails.email}
+                value={user.email}
                 required
                 onChange={(e) =>
-                  setUserDetails({
-                    ...userDetails,
+                  setUser({
+                    ...user,
                     [e.target.name]: e.target.value,
                   })
                 }
@@ -169,10 +188,10 @@ const Signup = () => {
               <PasswordInput
                 className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                 name='password'
-                value={userDetails.password}
+                value={user.password}
                 onChange={(e) =>
-                  setUserDetails({
-                    ...userDetails,
+                  setUser({
+                    ...user,
                     [e.target.name]: e.target.value,
                   })
                 }
@@ -192,10 +211,10 @@ const Signup = () => {
               <PasswordInput
                 className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                 name='confirmPassword'
-                value={userDetails.confirmPassword}
+                value={user.confirmPassword}
                 onChange={(e) =>
-                  setUserDetails({
-                    ...userDetails,
+                  setUser({
+                    ...user,
                     [e.target.name]: e.target.value,
                   })
                 }
@@ -207,11 +226,18 @@ const Signup = () => {
           </div>
           <div className='flex items-center p-6 pt-0'>
             <Button
-              disabled={false}
+              disabled={isLoading}
               type='submit'
               className='inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full'
             >
-              Create account
+              {isLoading ? (
+                <>
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                  Please wait...
+                </>
+              ) : (
+                'Create account'
+              )}
             </Button>
           </div>
         </form>
