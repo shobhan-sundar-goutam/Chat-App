@@ -3,8 +3,16 @@ import PasswordInput from '@/components/PasswordInput';
 import { GithubSvg } from '@/components/Svg/GithubSvg';
 import { GoogleSvg } from '@/components/Svg/GoogleSvg';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { CircleUserRound, Loader2, LockKeyhole, Mail } from 'lucide-react';
+import {
+  CircleUserRound,
+  Loader2,
+  LockKeyhole,
+  Mail,
+  User,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -43,8 +51,6 @@ const Signup = () => {
         description: error.data.message ?? 'Oops! Something went wrong.',
       });
     }
-
-    // console.log(user);
   };
 
   const validateForm = (data) => {
@@ -100,7 +106,7 @@ const Signup = () => {
             Enter your email below to create your account
           </p>
         </div>
-        <form onSubmit={handleSubmit}>
+        <form encType='multipart/form-data' onSubmit={handleSubmit}>
           <div className='p-6 pt-0 grid gap-4'>
             <div className='grid grid-cols-2 gap-6'>
               <button className='inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2'>
@@ -124,15 +130,11 @@ const Signup = () => {
             </div>
 
             <div className='grid gap-2'>
-              <label
-                className='required flex gap-1 items-center text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-                htmlFor='name'
-              >
-                <CircleUserRound size={16} />
+              <Label className='flex gap-1 items-center' htmlFor='name'>
+                <User size={16} />
                 Name
-              </label>
-              <input
-                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+              </Label>
+              <Input
                 id='name'
                 placeholder='Name'
                 type='text'
@@ -151,15 +153,14 @@ const Signup = () => {
               )}
             </div>
             <div className='grid gap-2'>
-              <label
-                className='required flex gap-1 items-center text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+              <Label
+                className='required flex gap-1 items-center'
                 htmlFor='email'
               >
                 <Mail size={16} />
                 Email
-              </label>
-              <input
-                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+              </Label>
+              <Input
                 id='email'
                 placeholder='mail@example.com'
                 type='email'
@@ -178,13 +179,10 @@ const Signup = () => {
               )}
             </div>
             <div className='grid gap-2'>
-              <label
-                className='flex gap-1 items-center text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-                htmlFor='password'
-              >
+              <Label className='flex gap-1 items-center' htmlFor='password'>
                 <LockKeyhole size={16} />
                 Password
-              </label>
+              </Label>
               <PasswordInput
                 className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                 name='password'
@@ -201,13 +199,13 @@ const Signup = () => {
               )}
             </div>
             <div className='grid gap-2'>
-              <label
-                className='flex gap-1 items-center text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+              <Label
+                className='flex gap-1 items-center'
                 htmlFor='confirmPassword'
               >
                 <LockKeyhole size={16} />
                 Confirm Password
-              </label>
+              </Label>
               <PasswordInput
                 className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                 name='confirmPassword'
@@ -222,6 +220,20 @@ const Signup = () => {
               {errors.confirmPassword && (
                 <p className='text-sm text-red-600'>{errors.confirmPassword}</p>
               )}
+            </div>
+            <div className='grid gap-2'>
+              <Label
+                className='required flex gap-1 items-center'
+                htmlFor='picture'
+              >
+                <CircleUserRound size={16} />
+                Picture
+              </Label>
+              <Input
+                className='file:text-foreground file:cursor-pointer cursor-pointer'
+                id='picture'
+                type='file'
+              />
             </div>
           </div>
           <div className='flex items-center p-6 pt-0'>
