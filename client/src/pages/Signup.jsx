@@ -12,6 +12,7 @@ import {
   LockKeyhole,
   Mail,
   User,
+  X,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -20,6 +21,8 @@ const Signup = () => {
   const [user, setUser] = useState({
     name: '',
     email: '',
+    file: null,
+    filename: '',
     password: '',
     confirmPassword: '',
   });
@@ -37,8 +40,18 @@ const Signup = () => {
     }
 
     try {
-      const { confirmPassword, ...userDataToSend } = user;
-      const response = await signup(userDataToSend).unwrap();
+      const { name, email, password, file } = user;
+
+      const userData = new FormData();
+
+      userData.append('name', name);
+      userData.append('email', email);
+      userData.append('password', password);
+      userData.append('avatar', file);
+
+      console.log(userData);
+
+      const response = await signup(userData).unwrap();
       console.log(response);
       toast({
         description: response.message,
@@ -221,7 +234,7 @@ const Signup = () => {
                 <p className='text-sm text-red-600'>{errors.confirmPassword}</p>
               )}
             </div>
-            <div className='grid gap-2'>
+            <div className='grid gap-2 relative'>
               <Label
                 className='required flex gap-1 items-center'
                 htmlFor='picture'
@@ -230,10 +243,26 @@ const Signup = () => {
                 Picture
               </Label>
               <Input
-                className='file:text-foreground file:cursor-pointer cursor-pointer'
+                className='file:text-foreground file:cursor-pointer cursor-pointer pe-7'
                 id='picture'
+                name='filename'
+                value={user.filename}
                 type='file'
+                onChange={(e) => {
+                  setUser({
+                    ...user,
+                    [e.target.name]: e.target.value,
+                    file: e.target.files[0],
+                  });
+                  console.log(e.target.files);
+                }}
               />
+              <span
+                className='cursor-pointer absolute right-3 bottom-3 text-primary hover:text-destructive'
+                onClick={() => setUser({ ...user, file: null, filename: '' })}
+              >
+                {user.filename && <X size={16} />}
+              </span>
             </div>
           </div>
           <div className='flex items-center p-6 pt-0'>

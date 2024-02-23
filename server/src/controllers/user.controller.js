@@ -2,6 +2,7 @@ import config from '../config/index.js';
 import User from '../models/user.schema.js';
 import ApiResponse from '../utils/apiResponse.js';
 import asyncHandler from '../utils/asyncHandler.js';
+import uploadOnCloudinary from '../utils/cloudinary.js';
 import CustomError from '../utils/customError.js';
 
 export const signup = asyncHandler(async (req, res) => {
@@ -17,15 +18,29 @@ export const signup = asyncHandler(async (req, res) => {
         throw new CustomError('User Already Exists', 409);
     }
 
-    // const localFilePath = req.file
+    const localFilePath = req.file.path;
+
+    let r = null;
+
+    if (localFilePath) {
+        r = await uploadOnCloudinary(localFilePath);
+    }
+
+    let publicId = null;
+    let url = null;
+
+    if (r) {
+        publicId = r.public_id;
+        url = r.secure_url;
+    }
 
     const user = await User.create({
         name,
         email,
         password,
         avatar: {
-            public_id: 'this is a public id',
-            url: 'urlstring',
+            public_id: publicId,
+            url: url,
         },
     });
 

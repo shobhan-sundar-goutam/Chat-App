@@ -1,4 +1,3 @@
-import { HandMetal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ModeToggle } from './ThemeToggler/ModeToggle';
 
@@ -8,7 +7,7 @@ const Navbar = () => {
       <div className='container flex h-14 max-w-screen-2xl justify-between items-center'>
         <Link
           to='/'
-          className='text-[28px]'
+          className='text-[28px] text-primary'
           style={{ fontFamily: 'Pacifico, cursive' }}
         >
           Whispr

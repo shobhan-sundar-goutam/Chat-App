@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
-import config from '../config';
+import config from '../config/index.js';
 
 cloudinary.config({
     cloud_name: config.CLOUDINARY_NAME,

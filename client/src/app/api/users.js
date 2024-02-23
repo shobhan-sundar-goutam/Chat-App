@@ -7,7 +7,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
             query: user => ({
                 url: `${USERS_URL}/signup`,
                 method: 'POST',
-                body: {...user}
+                body: user
             })
         })
     })
