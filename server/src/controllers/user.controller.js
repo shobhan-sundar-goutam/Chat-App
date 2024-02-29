@@ -18,30 +18,17 @@ export const signup = asyncHandler(async (req, res) => {
         throw new CustomError('User Already Exists', 409);
     }
 
-    const localFilePath = req.file.path;
+    let avatar = null;
 
-    let r = null;
-
-    if (localFilePath) {
-        r = await uploadOnCloudinary(localFilePath);
-    }
-
-    let publicId = null;
-    let url = null;
-
-    if (r) {
-        publicId = r.public_id;
-        url = r.secure_url;
+    if (req.file) {
+        avatar = await uploadOnCloudinary(req.file.path);
     }
 
     const user = await User.create({
         name,
         email,
         password,
-        avatar: {
-            public_id: publicId,
-            url: url,
-        },
+        avatar: avatar?.secure_url ?? null,
     });
 
     user.password = undefined;
