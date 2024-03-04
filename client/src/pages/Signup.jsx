@@ -95,6 +95,12 @@ const Signup = () => {
       errors.confirmPassword = 'Passwords do not match';
     }
 
+    if (data.file) {
+      if (!validateFileType(data.file)) {
+        errors.file = 'Invalid image type';
+      }
+    }
+
     return errors;
   };
 
@@ -107,6 +113,16 @@ const Signup = () => {
     const passwordRegex = /(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])/;
     return passwordRegex.test(password);
   };
+
+  function validateFileType(file) {
+    if (file) {
+      const pattern = /image-*/;
+
+      if (!file.type.match(pattern)) {
+        return false;
+      } else return true;
+    } else return true;
+  }
 
   return (
     <div className='mt-[3rem] lg:mt-[2rem] p-5 flex justify-center items-center'>
@@ -246,6 +262,7 @@ const Signup = () => {
                 className='file:text-foreground file:cursor-pointer cursor-pointer pe-7'
                 id='picture'
                 name='filename'
+                // accept='image/*'
                 value={user.filename}
                 type='file'
                 onChange={(e) => {
@@ -254,7 +271,7 @@ const Signup = () => {
                     [e.target.name]: e.target.value,
                     file: e.target.files[0],
                   });
-                  console.log(e.target.files);
+                  console.log(e.target.files[0]);
                 }}
               />
               <span
@@ -263,6 +280,9 @@ const Signup = () => {
               >
                 {user.filename && <X size={16} />}
               </span>
+              {errors.file && (
+                <p className='text-sm text-red-600'>{errors.file}</p>
+              )}
             </div>
           </div>
           <div className='flex items-center p-6 pt-0'>
