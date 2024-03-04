@@ -32,6 +32,7 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors({});
     const validationErrors = validateForm(user);
 
     if (Object.keys(validationErrors).length > 0) {
@@ -250,7 +251,7 @@ const Signup = () => {
                 <p className='text-sm text-red-600'>{errors.confirmPassword}</p>
               )}
             </div>
-            <div className='grid gap-2 relative'>
+            <div className='grid gap-2'>
               <Label
                 className='required flex gap-1 items-center'
                 htmlFor='picture'
@@ -258,28 +259,30 @@ const Signup = () => {
                 <CircleUserRound size={16} />
                 Picture
               </Label>
-              <Input
-                className='file:text-foreground file:cursor-pointer cursor-pointer pe-7'
-                id='picture'
-                name='filename'
-                // accept='image/*'
-                value={user.filename}
-                type='file'
-                onChange={(e) => {
-                  setUser({
-                    ...user,
-                    [e.target.name]: e.target.value,
-                    file: e.target.files[0],
-                  });
-                  console.log(e.target.files[0]);
-                }}
-              />
-              <span
-                className='cursor-pointer absolute right-3 bottom-3 text-primary hover:text-destructive'
-                onClick={() => setUser({ ...user, file: null, filename: '' })}
-              >
-                {user.filename && <X size={16} />}
-              </span>
+              <div className='relative'>
+                <Input
+                  className='file:text-foreground file:cursor-pointer cursor-pointer pe-7'
+                  id='picture'
+                  name='filename'
+                  // accept='image/*'
+                  value={user.filename}
+                  type='file'
+                  onChange={(e) => {
+                    setUser({
+                      ...user,
+                      [e.target.name]: e.target.value,
+                      file: e.target.files[0],
+                    });
+                    console.log(e.target.files[0]);
+                  }}
+                />
+                <span
+                  className='cursor-pointer absolute right-3 bottom-3 text-primary hover:text-destructive'
+                  onClick={() => setUser({ ...user, file: null, filename: '' })}
+                >
+                  {user.filename && <X size={16} />}
+                </span>
+              </div>
               {errors.file && (
                 <p className='text-sm text-red-600'>{errors.file}</p>
               )}
