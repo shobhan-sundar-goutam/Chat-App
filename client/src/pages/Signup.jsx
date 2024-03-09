@@ -6,14 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import {
-  CircleUserRound,
-  Loader2,
-  LockKeyhole,
-  Mail,
-  User,
-  X,
-} from 'lucide-react';
+import { Loader2, LockKeyhole, Mail, User } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -21,8 +14,6 @@ const Signup = () => {
   const [user, setUser] = useState({
     name: '',
     email: '',
-    file: null,
-    filename: '',
     password: '',
     confirmPassword: '',
   });
@@ -41,23 +32,18 @@ const Signup = () => {
     }
 
     try {
-      const { name, email, password, file } = user;
+      const { confirmPassword, ...userDataToSend } = user;
 
-      const userData = new FormData();
+      console.log(userDataToSend);
 
-      userData.append('name', name);
-      userData.append('email', email);
-      userData.append('password', password);
-      userData.append('avatar', file);
-
-      console.log(userData);
-
-      const response = await signup(userData).unwrap();
+      const response = await signup(userDataToSend).unwrap();
       console.log(response);
       toast({
         description: response.message,
         className: 'text-primary',
       });
+
+      setUser({ name: '', email: '', password: '', confirmPassword: '' });
     } catch (error) {
       console.log(error);
       toast({
@@ -96,12 +82,6 @@ const Signup = () => {
       errors.confirmPassword = 'Passwords do not match';
     }
 
-    if (data.file) {
-      if (!validateFileType(data.file)) {
-        errors.file = 'Invalid image type';
-      }
-    }
-
     return errors;
   };
 
@@ -115,15 +95,15 @@ const Signup = () => {
     return passwordRegex.test(password);
   };
 
-  function validateFileType(file) {
-    if (file) {
-      const pattern = /image-*/;
+  // function validateFileType(file) {
+  //   if (file) {
+  //     const pattern = /image-*/;
 
-      if (!file.type.match(pattern)) {
-        return false;
-      } else return true;
-    } else return true;
-  }
+  //     if (!file.type.match(pattern)) {
+  //       return false;
+  //     } else return true;
+  //   } else return true;
+  // }
 
   return (
     <div className='mt-[3rem] lg:mt-[2rem] p-5 flex justify-center items-center'>
@@ -249,42 +229,6 @@ const Signup = () => {
               />
               {errors.confirmPassword && (
                 <p className='text-sm text-red-600'>{errors.confirmPassword}</p>
-              )}
-            </div>
-            <div className='grid gap-2'>
-              <Label
-                className='required flex gap-1 items-center'
-                htmlFor='picture'
-              >
-                <CircleUserRound size={16} />
-                Picture
-              </Label>
-              <div className='relative'>
-                <Input
-                  className='file:text-foreground file:cursor-pointer cursor-pointer pe-7'
-                  id='picture'
-                  name='filename'
-                  // accept='image/*'
-                  value={user.filename}
-                  type='file'
-                  onChange={(e) => {
-                    setUser({
-                      ...user,
-                      [e.target.name]: e.target.value,
-                      file: e.target.files[0],
-                    });
-                    console.log(e.target.files[0]);
-                  }}
-                />
-                <span
-                  className='cursor-pointer absolute right-3 bottom-3 text-primary hover:text-destructive'
-                  onClick={() => setUser({ ...user, file: null, filename: '' })}
-                >
-                  {user.filename && <X size={16} />}
-                </span>
-              </div>
-              {errors.file && (
-                <p className='text-sm text-red-600'>{errors.file}</p>
               )}
             </div>
           </div>
