@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { signup } from '../controllers/user.controller.js';
-import upload from '../middlewares/multer.middleware.js';
+import { signup, verifyEmail } from '../controllers/user.controller.js';
 
 const router = Router();
 
-router.post('/signup', upload.single('avatar'), signup);
+router.post('/signup', signup);
+router.get('/verify/:token', verifyEmail);
 
 export default router;

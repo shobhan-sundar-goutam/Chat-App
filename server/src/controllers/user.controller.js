@@ -1,8 +1,10 @@
+import crypto from 'crypto';
 import config from '../config/index.js';
 import User from '../models/user.schema.js';
 import ApiResponse from '../utils/apiResponse.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import CustomError from '../utils/customError.js';
+import sendEmail from '../utils/sendEmail.js';
 
 export const signup = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
@@ -27,8 +29,54 @@ export const signup = asyncHandler(async (req, res) => {
         name,
         email,
         password,
-        avatar: null,
+        isVerified: false,
     });
+
+    const verificationToken = user.generateVerificationToken();
+
+    user.save({ validateBeforeSave: false });
+
+    // const verificationUrl = `${req.protocol}://${req.get('host')}/api/v1/users/verify/${verificationToken}`;
+    const verificationUrl = `${config.FRONTEND_URL}/verify/${verificationToken}`;
+
+    const text = `Hey ${user.name}, \n\nThank you for signing up for our service! To complete your registration and start using our platform, please click the link below to verify your email address:- \n\n ${verificationUrl} \n\nIf you did not create an account, please disregard this email. \n\nBest regards,\nShobhan Sundar Goutam (Founder, Whispr)`;
+
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: 'Verify your email address',
+            text,
+        });
+
+        res.status(200).json(new ApiResponse(200, '', `Verification mail sent to ${user.email}`));
+    } catch (error) {
+        user.verificationToken = undefined;
+        user.verificationTokenExpiry = undefined;
+
+        await user.save({ validateBeforeSave: false });
+
+        throw new CustomError(error.message || 'Password reset email failed to send', 500);
+    }
+});
+
+export const verifyEmail = asyncHandler(async (req, res) => {
+    const verificationToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+
+    console.log(req.params.token, verificationToken);
+    const user = await User.findOne({
+        verificationToken,
+        verificationTokenExpiry: { $gt: Date.now() },
+    });
+    console.log(user);
+    if (!user) {
+        throw new CustomError('Verification Token is Invalid or has been expired', 400);
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiry = undefined;
+
+    await user.save({ validateBeforeSave: false });
 
     user.password = undefined;
 
@@ -42,7 +90,7 @@ export const signup = asyncHandler(async (req, res) => {
     return res
         .status(201)
         .cookie('token', token, options)
-        .json(new ApiResponse(200, user, 'User registered Successfully'));
+        .json(new ApiResponse(200, user, 'Email verified and User registered Successfully'));
 });
 
 export const login = asyncHandler(async (req, res) => {

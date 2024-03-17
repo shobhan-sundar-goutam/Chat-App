@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import JWT from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import validator from 'validator';
@@ -25,9 +26,10 @@ const userSchema = new mongoose.Schema(
             minLength: [8, 'Password should be greater than 8 characters'],
             select: false,
         },
-        avatar: {
-            type: String,
-        },
+        avatar: String,
+        isVerified: Boolean,
+        verificationToken: String,
+        verificationTokenExpiry: Date,
         // role: {
         // type: String,
         //  enum: Object.values(AuthRoles),
@@ -60,8 +62,29 @@ userSchema.methods = {
             }
         );
     },
+
     comparePassword: async function (enterdPassword) {
         return await bcrypt.compare(enterdPassword, this.password);
+    },
+
+    generateVerificationToken: function () {
+        const token = crypto.randomBytes(20).toString('hex');
+
+        this.verificationToken = crypto.createHash('sha256').update(token).digest('hex');
+
+        this.verificationTokenExpiry = Date.now() + 20 * 60 * 1000;
+
+        return token;
+    },
+
+    generateForgotPasswordToken: function () {
+        const resetToken = crypto.randomBytes(20).toString('hex');
+
+        this.forgotPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+        this.forgotPasswordExpiry = Date.now() + 20 * 60 * 1000;
+
+        return resetToken;
     },
 };
 
