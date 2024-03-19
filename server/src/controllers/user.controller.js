@@ -59,40 +59,6 @@ export const signup = asyncHandler(async (req, res) => {
     }
 });
 
-export const verifyEmail = asyncHandler(async (req, res) => {
-    const verificationToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
-
-    console.log(req.params.token, verificationToken);
-    const user = await User.findOne({
-        verificationToken,
-        verificationTokenExpiry: { $gt: Date.now() },
-    });
-    console.log(user);
-    if (!user) {
-        throw new CustomError('Verification Token is Invalid or has been expired', 400);
-    }
-
-    user.isVerified = true;
-    user.verificationToken = undefined;
-    user.verificationTokenExpiry = undefined;
-
-    await user.save({ validateBeforeSave: false });
-
-    user.password = undefined;
-
-    const token = user.getJWTToken();
-
-    const options = {
-        expires: new Date(Date.now() + config.COOKIE_EXPIRY * 24 * 60 * 60 * 1000),
-        httpOnly: true,
-    };
-
-    return res
-        .status(201)
-        .cookie('token', token, options)
-        .json(new ApiResponse(200, user, 'Email verified and User registered Successfully'));
-});
-
 export const login = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -137,4 +103,40 @@ export const logout = asyncHandler(async (req, res) => {
         success: true,
         message: 'Logged out',
     });
+});
+
+export const verifyEmail = asyncHandler(async (req, res) => {
+    const verificationToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+
+    const user = await User.findOne({
+        verificationToken,
+        verificationTokenExpiry: { $gt: Date.now() },
+    });
+
+    if (!user) {
+        throw new CustomError(
+            `It looks like the email verification for signing up didn't work. The verification link may have expired.`,
+            400
+        );
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiry = undefined;
+
+    await user.save({ validateBeforeSave: false });
+
+    user.password = undefined;
+
+    const token = user.getJWTToken();
+
+    const options = {
+        expires: new Date(Date.now() + config.COOKIE_EXPIRY * 24 * 60 * 60 * 1000),
+        httpOnly: true,
+    };
+
+    return res
+        .status(201)
+        .cookie('token', token, options)
+        .json(new ApiResponse(200, user, 'Email verified and User registered Successfully'));
 });

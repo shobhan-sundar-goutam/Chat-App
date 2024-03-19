@@ -9,8 +9,11 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: user
             })
-        })
+        }),
+        verify: builder.query({
+            query: token => `${USERS_URL}/verify/${token}`,
+        }),
     })
 })
 
-export const {useSignupMutation} = userApiSlice
+export const {useSignupMutation, useVerifyQuery} = userApiSlice
