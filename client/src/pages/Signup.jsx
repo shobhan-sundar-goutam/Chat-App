@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
+import { setUserCredentials } from '@/features/userSlice';
 import { Loader2, LockKeyhole, Mail, User } from 'lucide-react';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 const Signup = () => {
@@ -20,6 +22,7 @@ const Signup = () => {
   const [errors, setErrors] = useState({});
   const [signup, { isLoading }] = useSignupMutation();
   const { toast } = useToast();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,6 +45,8 @@ const Signup = () => {
         description: response.message,
         className: 'text-primary',
       });
+
+      dispatch(setUserCredentials({ ...response.data }));
 
       setUser({ name: '', email: '', password: '', confirmPassword: '' });
     } catch (error) {

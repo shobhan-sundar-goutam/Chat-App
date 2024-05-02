@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import http from 'http';
@@ -17,9 +18,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
+        credentials: true,
         origin: 'http://localhost:5173',
     })
 );
+app.use(cookieParser());
 
 app.use('/api/v1/users', user);
 app.use('/api/v1', home);

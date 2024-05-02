@@ -29,7 +29,6 @@ export const signup = asyncHandler(async (req, res) => {
         name,
         email,
         password,
-        isVerified: false,
     });
 
     const verificationToken = user.generateVerificationToken();
@@ -48,21 +47,38 @@ export const signup = asyncHandler(async (req, res) => {
             text,
         });
 
-        res.status(200).json(new ApiResponse(200, '', `Verification mail sent to ${user.email}`));
+        user.password = undefined;
+        user.verificationToken = undefined;
+        user.verificationTokenExpiry = undefined;
+
+        const token = user.getJWTToken();
+
+        const options = {
+            expires: new Date(Date.now() + config.COOKIE_EXPIRY * 15 * 60 * 1000),
+            httpOnly: true,
+        };
+
+        return res
+            .status(201)
+            .cookie('token', token, options)
+            .json(new ApiResponse(200, user, `Verification mail sent to ${user.email}`));
     } catch (error) {
         user.verificationToken = undefined;
         user.verificationTokenExpiry = undefined;
 
         await user.save({ validateBeforeSave: false });
 
-        throw new CustomError(error.message || 'Password reset email failed to send', 500);
+        throw new CustomError(
+            error.message || 'Something went wrong during signup or mail sent',
+            500
+        );
     }
 });
 
 export const login = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!name || !email || !password) {
+    if (!email || !password) {
         throw new CustomError('Please fill all the details', 400);
     }
 
@@ -83,14 +99,15 @@ export const login = asyncHandler(async (req, res) => {
     const token = user.getJWTToken();
 
     const options = {
-        expires: new Date(Date.now() + config.COOKIE_EXPIRY * 24 * 60 * 60 * 1000),
+        // expires: new Date(Date.now() + config.COOKIE_EXPIRY * 24 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + config.COOKIE_EXPIRY * 15 * 60 * 1000),
         httpOnly: true,
     };
 
     return res
         .status(201)
         .cookie('token', token, options)
-        .json(new ApiResponse(200, user, 'User logged In Successfully'));
+        .json(new ApiResponse(200, user, 'User logged in Successfully'));
 });
 
 export const logout = asyncHandler(async (req, res) => {
@@ -126,17 +143,15 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 
     await user.save({ validateBeforeSave: false });
 
-    user.password = undefined;
+    return res.status(200).json(new ApiResponse(200, user, 'Email verified Successfully'));
+});
 
-    const token = user.getJWTToken();
+export const getUserDetails = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
 
-    const options = {
-        expires: new Date(Date.now() + config.COOKIE_EXPIRY * 24 * 60 * 60 * 1000),
-        httpOnly: true,
-    };
+    if (!user) {
+        throw new CustomError(`User not found`, 400);
+    }
 
-    return res
-        .status(201)
-        .cookie('token', token, options)
-        .json(new ApiResponse(200, user, 'Email verified and User registered Successfully'));
+    return res.status(200).json(new ApiResponse(200, user, 'User Profile Details'));
 });

@@ -10,10 +10,23 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 body: user
             })
         }),
-        verify: builder.query({
-            query: token => `${USERS_URL}/verify/${token}`,
+        verify: builder.mutation({
+            query: token => ({
+                url: `${USERS_URL}/verify/${token}`,
+                method: 'POST'
+            })
+        }),
+        userProfileDetials: builder.query({
+            query: () => ({url: `${USERS_URL}/profile`})
+        }),
+        login: builder.mutation({
+            query: user => ({
+                url: `${USERS_URL}/login`,
+                method: 'POST',
+                body: user
+            })
         }),
     })
 })
 
-export const {useSignupMutation, useVerifyQuery} = userApiSlice
+export const {useSignupMutation, useVerifyMutation, useUserProfileDetialsQuery, useLoginMutation} = userApiSlice

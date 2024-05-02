@@ -7,6 +7,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import ProtectedRoutes from './components/ProtectedRoutes';
 import Verify from './pages/Verify';
 
 const router = createBrowserRouter([
@@ -14,10 +15,6 @@ const router = createBrowserRouter([
     path: '/',
     element: <App />,
     children: [
-      {
-        path: '',
-        element: <Home />,
-      },
       {
         path: '/signup',
         element: <Signup />,
@@ -29,6 +26,15 @@ const router = createBrowserRouter([
       {
         path: '/verify/:token',
         element: <Verify />,
+      },
+      {
+        element: <ProtectedRoutes />,
+        children: [
+          {
+            path: '',
+            element: <Home />,
+          },
+        ],
       },
     ],
   },

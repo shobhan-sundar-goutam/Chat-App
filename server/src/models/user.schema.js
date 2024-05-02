@@ -27,7 +27,10 @@ const userSchema = new mongoose.Schema(
             select: false,
         },
         avatar: String,
-        isVerified: Boolean,
+        isVerified: {
+            type: Boolean,
+            default: false,
+        },
         verificationToken: String,
         verificationTokenExpiry: Date,
         // role: {
