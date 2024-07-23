@@ -1,4 +1,4 @@
-import { useLoginMutation } from '@/app/api/users';
+import { useLoginMutation, useUserProfileDetialsQuery } from '@/app/api/users';
 import PasswordInput from '@/components/PasswordInput';
 import { GithubSvg } from '@/components/Svg/GithubSvg';
 import { GoogleSvg } from '@/components/Svg/GoogleSvg';
@@ -10,7 +10,7 @@ import { setUserCredentials } from '@/features/userSlice';
 import { Loader2, LockKeyhole, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [user, setUser] = useState({
@@ -22,6 +22,8 @@ const Login = () => {
   const { toast } = useToast();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { data: userAlreadyLoggedIn, isLoading: userRequestLoading } =
+    useUserProfileDetialsQuery('', {});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +43,7 @@ const Login = () => {
         className: 'text-primary',
       });
 
-      dispatch(setUserCredentials({ ...response.data }));
+      dispatch(setUserCredentials({ ...response }));
 
       setUser({ email: '', password: '' });
 
@@ -69,7 +71,13 @@ const Login = () => {
     return errors;
   };
 
-  return (
+  return userRequestLoading ? (
+    <div className='h-64 flex justify-center items-center'>
+      <Loader2 className='animate-spin' />
+    </div>
+  ) : userAlreadyLoggedIn ? (
+    <Navigate to='/' />
+  ) : (
     <div className='mt-[3rem] lg:mt-[2rem] p-5 flex justify-center items-center'>
       <div className='w-[360px] rounded-lg border bg-card text-card-foreground shadow-sm'>
         <div className='flex flex-col p-6 space-y-1 text-center'>
@@ -163,11 +171,31 @@ const Login = () => {
               )}
             </Button>
           </div>
+          <div className='flex items-center p-6 pt-0'>
+            <Button
+              disabled={isLoading}
+              type='submit'
+              className='inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-normal ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-slate-300 h-10 px-4 py-2 w-full'
+              variant='destructive'
+              onClick={() =>
+                setUser({ email: 'guest@gmail.com', password: 'sgS@d#S3' })
+              }
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                  Please wait...
+                </>
+              ) : (
+                'Sign In as Guest User'
+              )}
+            </Button>
+          </div>
         </form>
         <div className='flex items-center justify-center p-6 pt-0 text-xs text-muted-foreground'>
           Don't have an account?
           <Link to='/signup' className='text-primary px-1'>
-            Sign up
+            Sign Up
           </Link>
         </div>
       </div>

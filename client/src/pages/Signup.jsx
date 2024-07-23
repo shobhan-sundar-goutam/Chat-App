@@ -1,4 +1,4 @@
-import { useSignupMutation } from '@/app/api/users';
+import { useSignupMutation, useUserProfileDetialsQuery } from '@/app/api/users';
 import PasswordInput from '@/components/PasswordInput';
 import { GithubSvg } from '@/components/Svg/GithubSvg';
 import { GoogleSvg } from '@/components/Svg/GoogleSvg';
@@ -10,7 +10,7 @@ import { setUserCredentials } from '@/features/userSlice';
 import { Loader2, LockKeyhole, Mail, User } from 'lucide-react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 const Signup = () => {
   const [user, setUser] = useState({
@@ -23,6 +23,9 @@ const Signup = () => {
   const [signup, { isLoading }] = useSignupMutation();
   const { toast } = useToast();
   const dispatch = useDispatch();
+
+  const { data: userAlreadyLoggedIn, isLoading: userRequestLoading } =
+    useUserProfileDetialsQuery('', {});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,7 +49,7 @@ const Signup = () => {
         className: 'text-primary',
       });
 
-      dispatch(setUserCredentials({ ...response.data }));
+      dispatch(setUserCredentials({ ...response }));
 
       setUser({ name: '', email: '', password: '', confirmPassword: '' });
     } catch (error) {
@@ -100,17 +103,13 @@ const Signup = () => {
     return passwordRegex.test(password);
   };
 
-  // function validateFileType(file) {
-  //   if (file) {
-  //     const pattern = /image-*/;
-
-  //     if (!file.type.match(pattern)) {
-  //       return false;
-  //     } else return true;
-  //   } else return true;
-  // }
-
-  return (
+  return userRequestLoading ? (
+    <div className='h-64 flex justify-center items-center'>
+      <Loader2 className='animate-spin' />
+    </div>
+  ) : userAlreadyLoggedIn?.isVerified ? (
+    <Navigate to='/' />
+  ) : (
     <div className='mt-[3rem] lg:mt-[2rem] p-5 flex justify-center items-center'>
       <div className='w-[360px] rounded-lg border bg-card text-card-foreground shadow-sm'>
         <div className='flex flex-col p-6 space-y-1 text-center'>
@@ -257,7 +256,7 @@ const Signup = () => {
         <div className='flex items-center justify-center p-6 pt-0 text-xs text-muted-foreground'>
           Already have an account?
           <Link to='/login' className='text-primary px-1'>
-            Sign in
+            Sign In
           </Link>
         </div>
       </div>

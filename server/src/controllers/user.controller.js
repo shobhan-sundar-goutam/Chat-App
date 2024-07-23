@@ -111,15 +111,18 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 export const logout = asyncHandler(async (req, res) => {
-    res.cookie('token', null, {
-        expires: new Date(Date.now()),
-        httpOnly: true,
-    });
+    const user = await User.findById(req.user._id);
 
-    res.status(200).json({
-        success: true,
-        message: 'Logged out',
-    });
+    if (!user) {
+        throw new CustomError(`User not found`, 400);
+    }
+
+    const options = { httpOnly: true };
+
+    return res
+        .status(200)
+        .clearCookie('token', options)
+        .json(new ApiResponse(200, {}, 'User Logged Out'));
 });
 
 export const verifyEmail = asyncHandler(async (req, res) => {
@@ -132,7 +135,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 
     if (!user) {
         throw new CustomError(
-            `It looks like the email verification for signing up didn't work. The verification link may have expired.`,
+            `It looks like the email verification for signing up didn't work. The verification link may have expired. Plese verify after Signing into your account.`,
             400
         );
     }

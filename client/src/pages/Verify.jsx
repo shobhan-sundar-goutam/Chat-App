@@ -25,7 +25,7 @@ const Verify = () => {
     try {
       const response = await verify(token).unwrap();
       console.log(response);
-      dispatch(setUserCredentials({ ...response.data }));
+      dispatch(setUserCredentials({ ...response }));
       return navigate('/');
     } catch (error) {
       console.log(error);
@@ -35,31 +35,6 @@ const Verify = () => {
       });
     }
   }
-
-  // if (response.status === 'pending') {
-  //   return <div>Loading...</div>;
-  // } else if (response.status === 'rejected') {
-  //   return (
-  //     <div className='mt-40 mx-20'>
-  //       <Alert variant='destructive' className='text-xl'>
-  //         <div className='flex items-center gap-2'>
-  //           <AlertCircle className='h-5 w-5' />
-  //           <AlertTitle className='text-lg'>Error</AlertTitle>
-  //         </div>
-  //         <AlertDescription className='text-lg ps-8'>
-  //           {response.error.data.message ||
-  //             'Something went wrong. Please click on the url again or refresh the page'}
-  //           <br />
-  //           <Button className='mt-2'>
-  //             <Link to='/login'>Go to Sign In</Link>
-  //           </Button>
-  //         </AlertDescription>
-  //       </Alert>
-  //     </div>
-  //   );
-  // } else {
-  //   return <Navigate to='/' replace={true} />;
-  // }
 
   return error.isError ? (
     <div className='mt-40 mx-20'>
